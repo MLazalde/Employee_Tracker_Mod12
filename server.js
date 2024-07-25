@@ -23,7 +23,6 @@ const pool = new Pool(
   console.log("Connected to the employeeTracker_db database!")
 );
 
-//
 pool.connect();
 
 async function promptManager() {
