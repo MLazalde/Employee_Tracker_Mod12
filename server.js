@@ -1,13 +1,6 @@
-const express = require("express");
 // Import and require Pool (node-postgres)
 const { Pool } = require("pg");
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const inquirer = require("inquirer");
 
 // Connect to database
 //{} = object stored in pool
@@ -18,7 +11,7 @@ const pool = new Pool(
     // Enter PostgreSQL password
     password: "root",
     host: "localhost",
-    database: "employeeTracker_db",
+    database: "employeetracker_db",
   },
   console.log("Connected to the employeeTracker_db database!")
 );
