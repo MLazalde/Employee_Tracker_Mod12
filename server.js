@@ -152,7 +152,7 @@ async function promptManager() {
   }
 
   if (answers.menu === "Update an employees' role") {
-    const answers = await inquirer.prompt([
+    const updateAnswers = await inquirer.prompt([
       {
         type: "input",
         name: "updateEmployee",
@@ -166,7 +166,7 @@ async function promptManager() {
     ]);
     pool.query(
       `UPDATE employee SET role_id = $1 WHERE id = $2`,
-      [answers.updateRole, answers.updateEmployee],
+      [updateAnswers.updateRole, updateAnswers.updateEmployee],
       (err, result) => {
         if (err) throw err;
         console.log(
