@@ -1,9 +1,17 @@
+// const express = require("express");
 // Import and require Pool (node-postgres)
 const { Pool } = require("pg");
-const inquirer = require("inquirer");
+
+// const PORT = process.env.PORT || 3001;
+// const app = express();
+
+// // Express middleware
+// app.use(express.urlencoded({ extended: false }));
+// app.use(express.json());
 
 // Connect to database
 //{} = object stored in pool
+const inquirer = require("inquirer");
 const pool = new Pool(
   {
     // Enter PostgreSQL username
@@ -39,26 +47,26 @@ async function promptManager() {
   if (answers.menu === "View all departments") {
     pool.query(`SELECT * FROM department`, (err, result) => {
       if (err) throw err;
-      console.table(result);
+      console.table(result.rows);
       promptManager();
     });
   }
   if (answers.menu === "View all roles") {
     pool.query(`SELECT * FROM role`, (err, result) => {
       if (err) throw err;
-      console.table(result);
+      console.table(result.rows);
       promptManager();
     });
   }
   if (answers.menu === "View all employees") {
     pool.query(`SELECT * FROM employee`, (err, result) => {
       if (err) throw err;
-      console.table(result);
+      console.table(result.rows);
       promptManager();
     });
   }
   if (answers.menu === "Add department") {
-    const answers = await inquirer.prompt([
+    const department = await inquirer.prompt([
       {
         type: "input",
         name: "newDepartment",
@@ -66,11 +74,11 @@ async function promptManager() {
       },
     ]);
     pool.query(
-      `INSERT INTO department (department_name) VALUES (?)`,
-      [answers.newDepartment],
+      `INSERT INTO department (department_name) VALUES ($1)`,
+      [department.newDepartment],
       (err, result) => {
         if (err) throw err;
-        console.table(result);
+        console.table(result.rows);
         promptManager();
       }
     );
@@ -95,11 +103,11 @@ async function promptManager() {
       },
     ]);
     pool.query(
-      `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`,
+      `INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)`,
       [answers.newRole, answers.newSalary, answers.newDepartID],
       (err, result) => {
         if (err) throw err;
-        console.table(result);
+        console.log(`Added new role: ${roleAnswers.newRole}`);
         promptManager();
       }
     );
@@ -128,12 +136,16 @@ async function promptManager() {
         message: "What is the new employees' manager ID?",
       },
     ]);
+
+    const managerID = answers.managerID ? answers.managerID : null;
     pool.query(
-      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-      [answers.firstName, answers.lastName, answers.newRole, answers.managerID],
+      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`,
+      [answers.firstName, answers.lastName, answers.newRole, managerID],
       (err, result) => {
         if (err) throw err;
-        console.table(result);
+        console.log(
+          `Added new employee: ${answers.firstName} ${answers.lastName}`
+        );
         promptManager();
       }
     );
@@ -153,11 +165,13 @@ async function promptManager() {
       },
     ]);
     pool.query(
-      `UPDATE employee SET role_id = ? WHERE id = ?`,
+      `UPDATE employee SET role_id = $1 WHERE id = $2`,
       [answers.updateRole, answers.updateEmployee],
       (err, result) => {
         if (err) throw err;
-        console.table(result);
+        console.log(
+          `Updated employee ID ${updateAnswers.updateEmployee} to role ID ${updateAnswers.updateRole}`
+        );
         promptManager();
       }
     );
