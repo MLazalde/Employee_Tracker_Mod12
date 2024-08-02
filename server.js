@@ -107,7 +107,7 @@ async function promptManager() {
       [answers.newRole, answers.newSalary, answers.newDepartID],
       (err, result) => {
         if (err) throw err;
-        console.log(`Added new role: ${roleAnswers.newRole}`);
+        // console.log(`Added new role: ${roleAnswers.newRole}`);
         promptManager();
       }
     );
